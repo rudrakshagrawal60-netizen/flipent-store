@@ -1,0 +1,13 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Flipent",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Flipent",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "id": "com.flipent.app",
+  "description": "Your Ultimate Daily Needs Mega Store."
+}
