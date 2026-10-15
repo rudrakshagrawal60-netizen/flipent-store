@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flipent - Mega Online Shopping Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            
+            <!-- Logo & Location Picker -->
+            <div class="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center space-x-2 cursor-pointer" onclick="filterCategory('All')">
+                    <i class="fa-solid fa-bag-shopping text-2xl text-blue-600"></i>
+                    <span class="text-2xl font-extrabold text-blue-700 tracking-wide">Flipent</span>
+                </div>
+                
+                <!-- Address / Pincode Location Widget -->
+                <div onclick="openAddressModal()" class="flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-xs text-gray-700 cursor-pointer transition border border-gray-200">
+                    <i class="fa-solid fa-location-dot text-blue-600"></i>
+                    <span id="userLocationText" class="font-medium truncate max-w-[140px]">Add Address / Pincode</span>
+                </div>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="flex items-center bg-gray-100 rounded-full px-4 py-2 w-full md:w-96 border border-gray-200">
+                <i class="fa-solid fa-magnifying-glass text-gray-400 mr-2"></i>
+                <input type="text" id="searchInput" placeholder="Search across all categories, brands..." class="bg-transparent outline-none w-full text-sm" onkeyup="searchProducts()">
+            </div>
+
+            <!-- Action Icons & Auth -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openWishlistModal()" class="relative text-gray-700 hover:text-blue-600 transition p-2" title="Wishlist">
+                    <i class="fa-regular fa-heart text-xl"></i>
+                    <span id="wishlistCount" class="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">0</span>
+                </button>
+                <button onclick="openOrdersModal()" class="relative text-gray-700 hover:text-blue-600 transition p-2" title="My Orders">
+                    <i class="fa-solid fa-box-archive text-xl"></i>
+                </button>
+                <button onclick="openCartModal()" class="relative text-gray-700 hover:text-blue-600 transition p-2" title="Cart">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">0</span>
+                </button>
+                <div id="authSection">
+                    <button onclick="openAuthModal('login')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition">Login / Signup</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Secondary Navigation Menu -->
+    <nav class="bg-white border-b hidden md:block">
+        <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center text-xs font-semibold text-gray-600 overflow-x-auto">
+            <div class="flex space-x-6">
+                <button onclick="openProfileModal()" class="hover:text-blue-600"><i class="fa-solid fa-user-gear mr-1"></i> My Profile</button>
+                <button onclick="openModal('subscriptionsModal')" class="hover:text-blue-600"><i class="fa-solid fa-crown mr-1"></i> Subscriptions</button>
+                <button onclick="openModal('couponsModal')" class="hover:text-blue-600 text-pink-600 font-bold"><i class="fa-solid fa-ticket mr-1"></i> Offers & Coupons</button>
+                <button onclick="openModal('settingsModal')" class="hover:text-blue-600"><i class="fa-solid fa-gear mr-1"></i> Settings</button>
+                <button onclick="openModal('helpModal')" class="hover:text-blue-600"><i class="fa-solid fa-circle-question mr-1"></i> Need Help / FAQ</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Category Tabs Bar -->
+    <div class="bg-white shadow-sm border-b py-3 px-4">
+        <div class="max-w-7xl mx-auto flex gap-3 overflow-x-auto scrollbar-none" id="categoryButtons">
+            <button onclick="filterCategory('All')" class="cat-btn px-4 py-2 rounded-full font-medium bg-blue-600 text-white text-xs shadow whitespace-nowrap transition">All Products</button>
+            <button onclick="filterCategory('Grocery & Staples')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Grocery & Staples</button>
+            <button onclick="filterCategory('Dairy, Breads & Eggs')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Dairy, Breads & Eggs</button>
+            <button onclick="filterCategory('Fruits & Vegetables')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Fruits & Vegetables</button>
+            <button onclick="filterCategory('Munchies & Chips')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Munchies & Chips</button>
+            <button onclick="filterCategory('Cold Drinks & Juices')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Cold Drinks & Juices</button>
+            <button onclick="filterCategory('Ice Creams & Desserts')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Ice Creams & Desserts</button>
+            <button onclick="filterCategory('Meat, Fish & Eggs')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Meat, Fish & Eggs</button>
+            <button onclick="filterCategory('Sweets & Chocolates')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Sweets & Chocolates</button>
+            <button onclick="filterCategory('Tea, Coffee & Drinks')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Tea, Coffee & Drinks</button>
+            <button onclick="filterCategory('Instant & Frozen Food')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Instant & Frozen Food</button>
+            <button onclick="filterCategory('Sauces & Spreads')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Sauces & Spreads</button>
+            <button onclick="filterCategory('Bakery & Biscuits')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Bakery & Biscuits</button>
+            <button onclick="filterCategory('Dry Fruits & Cereals')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Dry Fruits & Cereals</button>
+            <button onclick="filterCategory('Bath, Body & Hair Care')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Bath, Body & Hair Care</button>
+            <button onclick="filterCategory('Skin, Face & Cosmetics')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Skin, Face & Cosmetics</button>
+            <button onclick="filterCategory('Baby Care')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Baby Care</button>
+            <button onclick="filterCategory('Cleaners & Repellents')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Cleaners & Repellents</button>
+            <button onclick="filterCategory('Kitchenware & Appliances')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Kitchenware & Appliances</button>
+            <button onclick="filterCategory('Stationery & Games')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Stationery & Games</button>
+            <button onclick="filterCategory('Paan Corner')" class="cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition">Paan Corner</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="bg-blue-900 text-white py-16 px-4 text-center relative overflow-hidden">
+        <div class="max-w-3xl mx-auto z-10 relative">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Your Ultimate Daily Needs Mega Store - Flipent</h1>
+            <p class="text-blue-200 text-lg mb-8">Discover top global brands across Atta, Dal, Oil, Ghee, Milk, Butter, Ice Cream, Cold Drinks, Non-Veg, Fruits, Cosmetics, Toys & more with lightning fast delivery.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#products-section" class="bg-white text-blue-900 font-bold px-6 py-3 rounded-lg shadow hover:bg-blue-50 transition">Explore Catalog</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content & Products -->
+    <main class="max-w-7xl mx-auto px-4 py-10" id="products-section">
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Dynamic Products Loaded Here -->
+        </div>
+    </main>
+
+    <!-- Address / Pincode Setup Modal -->
+    <div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+            <button onclick="closeModal('addressModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-bold text-gray-900 mb-2"><i class="fa-solid fa-location-dot text-blue-600 mr-2"></i>Set Delivery Location</h2>
+            <p class="text-xs text-gray-500 mb-4">Enter your 6-digit pincode and address to check product availability.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">PINCODE</label>
+                    <input type="text" id="inputPincode" maxlength="6" placeholder="e.g. 281001" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">STREET ADDRESS / CITY</label>
+                    <input type="text" id="inputStreetCity" placeholder="House no, Street, City" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none">
+                </div>
+                <button onclick="saveDeliveryAddress()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Save Location</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coupons & Offers Modal -->
+    <div id="couponsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('couponsModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-ticket text-pink-600 mr-2"></i>Available Coupons</h2>
+            
+            <div class="space-y-3">
+                <div class="border border-dashed border-blue-300 bg-blue-50 rounded-xl p-4 flex justify-between items-center">
+                    <div>
+                        <span class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded font-bold">FLIP20</span>
+                        <p class="text-sm font-bold text-gray-800 mt-1">Get 20% OFF on orders above ₹499</p>
+                    </div>
+                    <button onclick="applyCoupon('FLIP20', 20)" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700">Apply</button>
+                </div>
+                <div class="border border-dashed border-pink-300 bg-pink-50 rounded-xl p-4 flex justify-between items-center">
+                    <div>
+                        <span class="bg-pink-600 text-white text-xs px-2 py-0.5 rounded font-bold">MEGA50</span>
+                        <p class="text-sm font-bold text-gray-800 mt-1">Flat ₹50 OFF on any purchase</p>
+                    </div>
+                    <button onclick="applyCoupon('MEGA50', 50)" class="bg-pink-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold hover:bg-pink-700">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div id="loginView">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Welcome to Flipent</h2>
+                <p class="text-sm text-gray-500 mb-6">Login using Mobile Number or Email.</p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">MOBILE NUMBER OR EMAIL</label>
+                        <input type="text" id="loginInput" placeholder="Enter mobile number or email" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none">
+                    </div>
+                    <button onclick="sendLoginOTP()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Send OTP</button>
+                    <p class="text-center text-sm text-gray-600 mt-4">Don't have an account? <button onclick="switchAuthView('signup')" class="text-blue-600 font-semibold hover:underline">Sign up</button></p>
+                </div>
+            </div>
+
+            <div id="loginOtpView" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Verify OTP</h2>
+                <p class="text-sm text-gray-500 mb-2">Enter the 4-digit OTP sent to your device.</p>
+                <p class="text-xs text-blue-600 font-semibold mb-4 bg-blue-50 p-2 rounded" id="loginOtpHint"></p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">ENTER OTP</label>
+                        <input type="text" id="loginOtpInput" maxlength="4" placeholder="1234" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-center tracking-widest text-lg font-bold outline-none">
+                    </div>
+                    <button onclick="verifyLoginOTP()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Verify & Login</button>
+                    <button onclick="switchAuthView('login')" class="w-full text-center text-xs text-gray-500 hover:underline mt-2">Back to Login</button>
+                </div>
+            </div>
+
+            <div id="signupView" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Create Account</h2>
+                <p class="text-sm text-gray-500 mb-6">Register with details & OTP verification.</p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">FULL NAME</label>
+                        <input type="text" id="signupName" placeholder="Enter your name" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">MOBILE NUMBER OR EMAIL</label>
+                        <input type="text" id="signupInput" placeholder="Enter mobile or email" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none">
+                    </div>
+                    <button onclick="sendSignupOTP()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Send Verification OTP</button>
+                    <p class="text-center text-sm text-gray-600 mt-4">Already registered? <button onclick="switchAuthView('login')" class="text-blue-600 font-semibold hover:underline">Login</button></p>
+                </div>
+            </div>
+
+            <div id="signupOtpView" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Verify Account</h2>
+                <p class="text-sm text-gray-500 mb-2">Enter the 4-digit OTP.</p>
+                <p class="text-xs text-blue-600 font-semibold mb-4 bg-blue-50 p-2 rounded" id="signupOtpHint"></p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">ENTER OTP</label>
+                        <input type="text" id="signupOtpInput" maxlength="4" placeholder="1234" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-center tracking-widest text-lg font-bold outline-none">
+                    </div>
+                    <button onclick="verifySignupOTP()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Verify & Register</button>
+                    <button onclick="switchAuthView('signup')" class="w-full text-center text-xs text-gray-500 hover:underline mt-2">Back to Signup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('profileModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-user-gear text-blue-600 mr-2"></i>User Profile Settings</h2>
+            
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">FIRST NAME</label>
+                        <input type="text" id="profFirstName" placeholder="First Name" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">LAST NAME</label>
+                        <input type="text" id="profLastName" placeholder="Last Name" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">PRIMARY MOBILE</label>
+                        <input type="tel" id="profMobile" placeholder="Primary Mobile" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">SECONDARY MOBILE</label>
+                        <input type="tel" id="profSecMobile" placeholder="Secondary Mobile" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">EMAIL ADDRESS</label>
+                    <input type="email" id="profEmail" placeholder="Email address" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">PINCODE & ADDRESS</label>
+                    <textarea id="profAddress" rows="2" placeholder="House no, Street, City, Pincode" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">GST DETAILS (Optional)</label>
+                    <input type="text" id="profGst" placeholder="e.g. 07AAAAA0000A1Z5" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none uppercase">
+                </div>
+                <button onclick="saveProfile()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Save Profile Details</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wishlist Modal -->
+    <div id="wishlistModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-end">
+        <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between p-6 overflow-y-auto">
+            <div>
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-heart text-pink-600 mr-2"></i>My Wishlist</h2>
+                    <button onclick="closeModal('wishlistModal')" class="text-gray-500 hover:text-gray-700 text-xl"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="wishlistItemsList" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Slide-Over Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-end">
+        <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between p-6 overflow-y-auto">
+            <div>
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Your Shopping Cart</h2>
+                    <button onclick="closeCartModal()" class="text-gray-500 hover:text-gray-700 text-xl"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="cartItemsList" class="space-y-4"></div>
+            </div>
+            <div class="border-t pt-4 mt-4">
+                <div class="flex justify-between text-sm text-gray-600 mb-1" id="couponDiscountRow" style="display:none;">
+                    <span>Coupon Discount:</span>
+                    <span id="couponDiscountText" class="text-green-600 font-bold">-₹0</span>
+                </div>
+                <div class="flex justify-between font-bold text-lg mb-4">
+                    <span>Total:</span>
+                    <span id="cartTotalPrice">₹0</span>
+                </div>
+                <button onclick="proceedToCheckout()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout / Payment Modal -->
+    <div id="checkoutModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 relative">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Checkout & Payment</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">DELIVERY ADDRESS & PINCODE</label>
+                    <textarea id="shipAddress" rows="2" placeholder="House no, Street, City, Pincode" class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-sm outline-none"></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-2">SELECT PAYMENT METHOD</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 border p-3 rounded-xl cursor-pointer hover:bg-gray-50">
+                            <input type="radio" name="payment" value="COD" checked class="text-blue-600">
+                            <span class="text-sm font-medium">Cash on Delivery (COD)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 border p-3 rounded-xl cursor-pointer hover:bg-gray-50">
+                            <input type="radio" name="payment" value="Online" class="text-blue-600">
+                            <span class="text-sm font-medium">UPI / QR Code / Credit & Debit Card</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="border-t pt-4 flex justify-between items-center">
+                    <span class="font-bold text-gray-700">Total Payable:</span>
+                    <span id="checkoutTotal" class="text-xl font-extrabold text-blue-600">₹0</span>
+                </div>
+
+                <button onclick="completeOrder()" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition">Place Order Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Orders Modal -->
+    <div id="ordersModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-end">
+        <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between p-6 overflow-y-auto">
+            <div>
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-box-archive text-blue-600 mr-2"></i>My Orders</h2>
+                    <button onclick="closeOrdersModal()" class="text-gray-500 hover:text-gray-700 text-xl"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="ordersList" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Tracking Modal -->
+    <div id="trackingModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 relative">
+            <button onclick="closeModal('trackingModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-bold text-gray-900 mb-2"><i class="fa-solid fa-map-location-dot text-blue-600 mr-2"></i>Live Order Tracking</h2>
+            <p id="trackingOrderId" class="text-xs text-gray-500 mb-4 font-semibold"></p>
+            
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 text-center relative overflow-hidden h-48 flex flex-col items-center justify-center">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#2563eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="animate-bounce mb-2">
+                    <i class="fa-solid fa-truck-fast text-4xl text-blue-600"></i>
+                </div>
+                <p id="trackingStatusText" class="font-bold text-blue-900 text-base">Out for Delivery</p>
+                <p class="text-xs text-gray-600 mt-1">Delivery partner is on the way to your delivery address.</p>
+            </div>
+
+            <div class="space-y-3 text-sm border-t pt-4">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Delivery Address:</span>
+                    <span id="trackAddress" class="font-medium text-right text-gray-800"></span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Estimated Delivery:</span>
+                    <span class="font-bold text-green-600">Today, 4:30 PM</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscriptions Modal -->
+    <div id="subscriptionsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+            <button onclick="closeModal('subscriptionsModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-bold text-gray-900 mb-2"><i class="fa-solid fa-crown text-amber-500 mr-2"></i>Flipent VIP Subscriptions</h2>
+            <p class="text-xs text-gray-500 mb-4">Enjoy free fast delivery, extra 10% discount on all categories, and priority support.</p>
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-4 text-center">
+                <p class="text-lg font-extrabold text-blue-900">₹499 / Year</p>
+                <p class="text-xs text-gray-600">Active Membership: <span class="font-bold text-green-600">Standard Free Tier</span></p>
+            </div>
+            <button onclick="alert('VIP Subscription simulated successfully!')" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Upgrade to VIP Now</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('settingsModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-gear text-gray-700 mr-2"></i>Settings & Privacy</h2>
+            
+            <div class="space-y-4 text-sm">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <span>Push Notifications</span>
+                    <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded">
+                </div>
+                <div class="flex justify-between items-center border-b pb-3">
+                    <span>Email Offers & Newsletters</span>
+                    <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded">
+                </div>
+                <div class="border-b pb-3">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">CHANGE LANGUAGE</label>
+                    <select class="w-full border rounded-lg p-2 bg-gray-50 text-sm">
+                        <option>English</option>
+                        <option>Hindi (हिंदी)</option>
+                        <option>Punjabi (ਪੰਜਾਬੀ)</option>
+                    </select>
+                </div>
+                <div>
+                    <button onclick="alert('All other sessions logged out.')" class="text-xs bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded font-medium">Logout All Other Devices</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Need Help & FAQ Modal -->
+    <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('helpModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-circle-question text-blue-600 mr-2"></i>Need Help & FAQ</h2>
+            
+            <div class="space-y-3 text-xs">
+                <div class="border-b pb-2">
+                    <p class="font-bold text-gray-800">Q: How do I track my order?</p>
+                    <p class="text-gray-500">A: Go to 'Orders' in the top menu and click on 'Track Live Location'.</p>
+                </div>
+                <div class="pt-2">
+                    <button onclick="alert('Support ticket raised! Our team will contact you shortly.')" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs hover:bg-blue-700 transition">Contact Customer Support</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-8 text-center mt-12">
+        <p>&copy; 2026 Flipent. All rights reserved. Built with ❤️ for Smart Shoppers.</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const products = [
+            // Grocery & Staples
+            { id: 1, title: "Aashirvaad Shudh Chakki Atta (10kg)", author: "Aashirvaad", price: 420, category: "Grocery & Staples", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80", desc: "100% pure wheat flour for soft rotis." },
+            { id: 2, title: "Fortune Sun Lite Sunflower Oil (5L)", author: "Fortune", price: 699, category: "Grocery & Staples", image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80", desc: "Light and healthy cooking oil." },
+            { id: 3, title: "Amul Pure Cow Ghee (1L)", author: "Amul", price: 650, category: "Grocery & Staples", image: "https://images.unsplash.com/photo-1631379578550-7038263db699?auto=format&fit=crop&w=400&q=80", desc: "Rich aroma and traditional taste." },
+            { id: 4, title: "Tata Sampann Toor Dal (1kg)", author: "Tata Sampann", price: 155, category: "Grocery & Staples", image: "https://images.unsplash.com/photo-1585998066891-63f47e677857?auto=format&fit=crop&w=400&q=80", desc: "Unpolished protein-rich toor dal." },
+            { id: 5, title: "India Gate Basmati Rice Feast Rozana (5kg)", author: "India Gate", price: 380, category: "Grocery & Staples", image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=400&q=80", desc: "Aromatic long grain rice for daily meals." },
+            { id: 6, title: "MDH Kitchen King Masala (500g)", author: "MDH", price: 210, category: "Grocery & Staples", image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=400&q=80", desc: "Blend of premium Indian spices." },
+            { id: 7, title: "Everest Turmeric Powder (500g)", author: "Everest", price: 130, category: "Grocery & Staples", image: "https://images.unsplash.com/photo-1615485500704-8e990f9900f1?auto=format&fit=crop&w=400&q=80", desc: "Pure golden turmeric powder." },
+
+            // Dairy, Breads & Eggs
+            { id: 8, title: "Amul Taaza Toned Fresh Milk (1L)", author: "Amul", price: 34, category: "Dairy, Breads & Eggs", image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=400&q=80", desc: "Pasteurized fresh toned milk." },
+            { id: 9, title: "Mother Dairy Full Cream Milk (1L)", author: "Mother Dairy", price: 38, category: "Dairy, Breads & Eggs", image: "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=400&q=80", desc: "Creamy and wholesome full cream milk." },
+            { id: 10, title: "Amul Butter - Pasteurized (500g)", author: "Amul", price: 275, category: "Dairy, Breads & Eggs", image: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80", desc: "Delicious table butter made from fresh cream." },
+            { id: 11, title: "Britannia 100% Wheat Bread (400g)", author: "Britannia", price: 45, category: "Dairy, Breads & Eggs", image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80", desc: "Healthy whole wheat sliced bread." },
+            { id: 12, title: "Farm Fresh White Eggs (Pack of 30)", author: "Local Farms", price: 210, category: "Dairy, Breads & Eggs", image: "https://images.unsplash.com/photo-1516448702986-77d0e340a563?auto=format&fit=crop&w=400&q=80", desc: "High protein farm fresh table eggs." },
+
+            // Fruits & Vegetables
+            { id: 13, title: "Fresh Kashmiri Apples (1kg)", author: "Farm Fresh", price: 190, category: "Fruits & Vegetables", image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80", desc: "Crisp, sweet, and juicy apples." },
+            { id: 14, title: "Robusta Bananas (1 Dozen)", author: "Farm Fresh", price: 60, category: "Fruits & Vegetables", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80", desc: "Energy-boosting ripe yellow bananas." },
+            { id: 15, title: "Alphonso Mangoes (1kg)", author: "Ratnagiri Farms", price: 450, category: "Fruits & Vegetables", image: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=400&q=80", desc: "King of mangoes, sweet and fragrant." },
+            { id: 16, title: "Fresh Green Kiwi (Pack of 3)", author: "Zespri", price: 120, category: "Fruits & Vegetables", image: "https://images.unsplash.com/photo-1585059895050-32e59178120b?auto=format&fit=crop&w=400&q=80", desc: "Rich in Vitamin C and antioxidants." },
+
+            // Munchies & Chips
+            { id: 17, title: "Lay's India's Magic Masala Chips (90g)", author: "Lay's", price: 40, category: "Munchies & Chips", image: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=400&q=80", desc: "Crispy potato chips with spicy masala." },
+            { id: 18, title: "Haldiram's Nagpur Bhujia Sev (400g)", author: "Haldiram's", price: 110, category: "Munchies & Chips", image: "https://images.unsplash.com/photo-1599488615731-7e5c2823ff26?auto=format&fit=crop&w=400&q=80", desc: "Traditional crispy spicy besan sev." },
+            { id: 19, title: "Kurkure Masala Munch (90g)", author: "Kurkure", price: 20, category: "Munchies & Chips", image: "https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&w=400&q=80", desc: "Crunchy puff snacks with chatpata masala." },
+            { id: 20, title: "Balaji Cream & Onion Wafers (100g)", author: "Balaji", price: 35, category: "Munchies & Chips", image: "https://images.unsplash.com/photo-1527960471264-932f39eb5846?auto=format&fit=crop&w=400&q=80", desc: "Crispy wafers loaded with cream & onion flavor." },
+
+            // Cold Drinks & Juices
+            { id: 21, title: "Coca-Cola Soft Drink (2L Bottle)", author: "Coca-Cola", price: 95, category: "Cold Drinks & Juices", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80", desc: "Refreshing carbonated soft drink." },
+            { id: 22, title: "Pepsi Soft Drink (2L Bottle)", author: "Pepsi", price: 95, category: "Cold Drinks & Juices", image: "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=400&q=80", desc: "Bold and crisp cola refreshment." },
+            { id: 23, title: "Real Fruit Power Mixed Fruit Juice (1L)", author: "Dabur", price: 140, category: "Cold Drinks & Juices", image: "https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=400&q=80", desc: "Made from 100% real fruit juice extracts." },
+
+            // Ice Creams & Desserts
+            { id: 24, title: "Amul Vanilla Magic Ice Cream Brick (700ml)", author: "Amul", price: 160, category: "Ice Creams & Desserts", image: "https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=400&q=80", desc: "Rich and creamy vanilla frozen dessert." },
+            { id: 25, title: "Kwality Walls Cornetto Double Chocolate", author: "Kwality Walls", price: 50, category: "Ice Creams & Desserts", image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=400&q=80", desc: "Crispy waffle cone filled with rich chocolate." },
+
+            // Meat, Fish & Eggs
+            { id: 26, title: "Fresh Tender Chicken Breast Boneless (500g)", author: "Licious", price: 249, category: "Meat, Fish & Eggs", image: "https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80", desc: "Cleaned and skinless fresh chicken breast." },
+            { id: 27, title: "Fresh Rohu Fish Curry Cut (500g)", author: "FreshtoHome", price: 220, category: "Meat, Fish & Eggs", image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=400&q=80", desc: "Fresh river fish cut into pieces." },
+            { id: 28, title: "Mutton Curry Cut - Bone In (500g)", author: "Licious", price: 499, category: "Meat, Fish & Eggs", image: "https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=400&q=80", desc: "Juicy and tender goat meat cuts." },
+
+            // Sweets & Chocolates
+            { id: 29, title: "Cadbury Dairy Milk Silk Chocolate (150g)", author: "Cadbury", price: 175, category: "Sweets & Chocolates", image: "https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&w=400&q=80", desc: "Smooth and creamy milk chocolate." },
+            { id: 30, title: "Ferrero Rocher Hazelnut Chocolates (16 Pcs)", author: "Ferrero", price: 650, category: "Sweets & Chocolates", image: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&w=400&q=80", desc: "Crisp hazelnut covered in milk chocolate." },
+            { id: 31, title: "Haldiram's Nagpur Gulab Jamun (1kg Tin)", author: "Haldiram's", price: 220, category: "Sweets & Chocolates", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=400&q=80", desc: "Traditional sweet khoya dumplings in sugar syrup." },
+
+            // Tea, Coffee & Drinks
+            { id: 32, title: "Tata Tea Gold Leaf Tea (500g)", author: "Tata Tea", price: 310, category: "Tea, Coffee & Drinks", image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80", desc: "Rich aroma and long tea leaves blend." },
+            { id: 33, title: "Nescafe Classic Instant Coffee Powder (100g)", author: "Nescafe", price: 315, category: "Tea, Coffee & Drinks", image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80", desc: "100% pure coffee for a rich awakening." },
+
+            // Instant & Frozen Food
+            { id: 34, title: "Maggi 2-Minute Masala Noodles (Pack of 12)", author: "Nestle", price: 168, category: "Instant & Frozen Food", image: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=400&q=80", desc: "Favorite instant noodles with masala tastemaker." },
+            { id: 35, title: "McCain Smiles Frozen French Fries (400g)", author: "McCain", price: 155, category: "Instant & Frozen Food", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=400&q=80", desc: "Crispy potato smileys ready to fry or bake." },
+
+            // Sauces & Spreads
+            { id: 36, title: "Kissan Fresh Tomato Ketchup (1kg)", author: "Kissan", price: 140, category: "Sauces & Spreads", image: "https://images.unsplash.com/photo-1582281298055-e25b84a30b0b?auto=format&fit=crop&w=400&q=80", desc: "Made with 100% real juicy tomatoes." },
+            { id: 37, title: "Dr. Oetker Fun Foods Real Mayonnaise (250g)", author: "Dr. Oetker", price: 95, category: "Sauces & Spreads", image: "https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&w=400&q=80", desc: "Smooth and creamy veg mayonnaise." },
+
+            // Bakery & Biscuits
+            { id: 38, title: "Parle-G Glucose Biscuits (Pack of 8)", author: "Parle", price: 50, category: "Bakery & Biscuits", image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=400&q=80", desc: "The world's largest selling biscuit." },
+            { id: 39, title: "Sunfeast Dark Fantasy Choco Fills (300g)", author: "Sunfeast", price: 140, category: "Bakery & Biscuits", image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=400&q=80", desc: "Cookies filled with decadent molten chocolate." },
+
+            // Dry Fruits & Cereals
+            { id: 40, title: "Happilo 100% Natural California Almonds (500g)", author: "Happilo", price: 449, category: "Dry Fruits & Cereals", image: "https://images.unsplash.com/photo-1508061253366-f7da154b6d46?auto=format&fit=crop&w=400&q=80", desc: "Premium quality crunchy almonds." },
+            { id: 41, title: "Kellogg's Corn Flakes Original (500g)", author: "Kellogg's", price: 215, category: "Dry Fruits & Cereals", image: "https://images.unsplash.com/photo-1521483451571-c0490ef0585e?auto=format&fit=crop&w=400&q=80", desc: "Nutritious breakfast cereal fortified with iron & vitamins." },
+
+            // Bath, Body & Hair Care
+            { id: 42, title: "Dove Cream Beauty Bathing Bar (Pack of 4)", author: "Dove", price: 240, category: "Bath, Body & Hair Care", image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80", desc: "1/4th moisturising cream bar for soft skin." },
+            { id: 43, title: "Head & Shoulders Anti-Dandruff Shampoo (650ml)", author: "Head & Shoulders", price: 599, category: "Bath, Body & Hair Care", image: "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=400&q=80", desc: "Scalp care anti-dandruff shampoo." },
+
+            // Skin, Face & Cosmetics
+            { id: 44, title: "Lakme Peach Milk Moisturizer (200ml)", author: "Lakme", price: 299, category: "Skin, Face & Cosmetics", image: "https://images.unsplash.com/photo-1608248597359-f5385fb5e44a?auto=format&fit=crop&w=400&q=80", desc: "Wholesome peach milk lotion for soft glowing skin." },
+            { id: 45, title: "Maybelline New York Colossal Kajal (0.35g)", author: "Maybelline", price: 199, category: "Skin, Face & Cosmetics", image: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=400&q=80", desc: "Deep black waterproof smudge-proof kajal." },
+
+            // Baby Care
+            { id: 46, title: "Pampers Baby Dry Pant Diapers (Medium, 64 Pcs)", author: "Pampers", price: 899, category: "Baby Care", image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=400&q=80", desc: "All-night absorption diaper pants." },
+            { id: 47, title: "Johnson's Baby Gentle Powder (400g)", author: "Johnson's", price: 225, category: "Baby Care", image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=400&q=80", desc: "Pure and gentle talcum powder for soft skin." },
+
+            // Cleaners & Repellents
+            { id: 48, title: "Lizol Floor Cleaner Citrus (975ml)", author: "Lizol", price: 210, category: "Cleaners & Repellents", image: "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=400&q=80", desc: "Removes 99.9% germs and tough stains." },
+            { id: 49, title: "Good Knight Gold Flash Mosquito Repellent Machine", author: "Good Knight", price: 135, category: "Cleaners & Repellents", image: "https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=400&q=80", desc: "Advanced mosquito protection system." },
+
+            // Kitchenware & Appliances
+            { id: 50, title: "Prestige Iris 750W Mixer Grinder (3 Jars)", author: "Prestige", price: 3499, category: "Kitchenware & Appliances", image: "https://images.unsplash.com/photo-1570222094114-d074f7e21e59?auto=format&fit=crop&w=400&q=80", desc: "Powerful motor and stainless steel jars." },
+            { id: 51, title: "Pigeon Non-Stick Cookware Gift Set (3 Pcs)", author: "Pigeon", price: 1299, category: "Kitchenware & Appliances", image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=400&q=80", desc: "Dosa tawa, fry pan, and kadhai set." },
+
+            // Stationery & Games
+            { id: 52, title: "Classmate Long Notebook (Soft Cover, 172 Pages, 6 Pcs)", author: "Classmate", price: 240, category: "Stationery & Games", image: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=400&q=80", desc: "High quality smooth white pages notebook." },
+            { id: 53, title: "Rubik's Classic 3x3 Cube Puzzle Game", author: "Rubik's", price: 399, category: "Stationery & Games", image: "https://images.unsplash.com/photo-1591991731833-b4807cf7ef94?auto=format&fit=crop&w=400&q=80", desc: "Original brain-teasing puzzle cube." },
+
+            // Paan Corner
+            { id: 54, title: "Rajnigandha Silver Pearls Mouth Freshener (100g)", author: "Rajnigandha", price: 150, category: "Paan Corner", image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=400&q=80", desc: "Scented cardamom seeds coated with silver foil." },
+            { id: 55, title: "Pass Pass Mint Fresh Drops (Pack of 50)", author: "Pass Pass", price: 50, category: "Paan Corner", image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=400&q=80", desc: "Refreshing mint candies for instant fresh breath." }
+        ];
+
+        let cart = [];
+        let wishlist = [];
+        let orders = [];
+        let currentCategory = 'All';
+        let currentUser = null;
+        let generatedOTP = "";
+        let pendingUserObj = null;
+        let appliedCoupon = null;
+        let discountAmount = 0;
+
+        window.onload = function() {
+            displayProducts(products);
+        };
+
+        function openAddressModal() {
+            document.getElementById('addressModal').classList.remove('hidden');
+        }
+
+        function saveDeliveryAddress() {
+            const pincode = document.getElementById('inputPincode').value;
+            const streetCity = document.getElementById('inputStreetCity').value;
+            if(!pincode || pincode.length !== 6) {
+                alert("Please enter a valid 6-digit Pincode.");
+                return;
+            }
+            const fullLocation = streetCity ? `${streetCity} - ${pincode}` : `Pincode: ${pincode}`;
+            document.getElementById('userLocationText').textContent = fullLocation;
+            document.getElementById('shipAddress').value = fullLocation;
+            closeModal('addressModal');
+            alert("Delivery location successfully updated!");
+        }
+
+        function applyCoupon(code, discount) {
+            appliedCoupon = code;
+            discountAmount = discount;
+            document.getElementById('couponDiscountRow').style.display = 'flex';
+            document.getElementById('couponDiscountText').textContent = `-₹${discount} (${code})`;
+            closeModal('couponsModal');
+            updateCartUI();
+            alert(`Coupon ${code} applied successfully!`);
+        }
+
+        function displayProducts(prodsToDisplay) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+            if (prodsToDisplay.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-10">No products found.</p>`;
+                return;
+            }
+            prodsToDisplay.forEach(prod => {
+                const isWishlisted = wishlist.some(b => b.id === prod.id);
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl shadow hover:shadow-lg transition flex flex-col overflow-hidden border border-gray-100 relative";
+                card.innerHTML = `
+                    <button onclick="toggleWishlist(${prod.id})" class="absolute top-2 right-2 bg-white/80 p-2 rounded-full shadow hover:bg-white text-pink-600 z-10">
+                        <i class="${isWishlisted ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                    </button>
+                    <div class="h-56 overflow-hidden bg-gray-100 relative group">
+                        <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-md font-semibold">${prod.category}</span>
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow justify-between">
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-900 mb-1">${prod.title}</h3>
+                            <p class="text-sm text-gray-500 mb-2">By ${prod.author}</p>
+                            <p class="text-xs text-gray-600 line-clamp-2 mb-4">${prod.desc}</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-auto">
+                            <span class="text-xl font-extrabold text-blue-600">₹${prod.price}</span>
+                            <button onclick="addToCart(${prod.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center space-x-1 cursor-pointer">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                <span>Add</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if(btn.textContent.includes(category) || (category === 'All' && btn.textContent === 'All Products')) {
+                    btn.className = "cat-btn px-4 py-2 rounded-full font-medium bg-blue-600 text-white text-xs shadow whitespace-nowrap transition";
+                } else {
+                    btn.className = "cat-btn px-4 py-2 rounded-full font-medium bg-gray-100 text-gray-700 text-xs whitespace-nowrap hover:bg-gray-200 transition";
+                }
+            });
+
+            if (category === 'All') {
+                displayProducts(products);
+            } else {
+                displayProducts(products.filter(p => p.category === category));
+            }
+        }
+
+        function searchProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let baseList = currentCategory === 'All' ? products : products.filter(p => p.category === currentCategory);
+            displayProducts(baseList.filter(p => p.title.toLowerCase().includes(query) || p.author.toLowerCase().includes(query) || p.category.toLowerCase().includes(query)));
+        }
+
+        // Auth Logic
+        function openAuthModal(mode) {
+            document.getElementById('authModal').classList.remove('hidden');
+            switchAuthView(mode);
+        }
+
+        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+
+        function switchAuthView(view) {
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('loginOtpView').classList.add('hidden');
+            document.getElementById('signupView').classList.add('hidden');
+            document.getElementById('signupOtpView').classList.add('hidden');
+
+            if(view === 'login') document.getElementById('loginView').classList.remove('hidden');
+            if(view === 'signup') document.getElementById('signupView').classList.remove('hidden');
+        }
+
+        function sendLoginOTP() {
+            const val = document.getElementById('loginInput').value;
+            if(!val) { alert("Please enter mobile number or email."); return; }
+            generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+            pendingUserObj = { name: "User", contact: val };
+            document.getElementById('loginOtpHint').textContent = `Demo OTP for ${val}: ${generatedOTP}`;
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('loginOtpView').classList.remove('hidden');
+        }
+
+        function verifyLoginOTP() {
+            if(document.getElementById('loginOtpInput').value === generatedOTP) {
+                currentUser = pendingUserObj;
+                updateAuthUI();
+                closeAuthModal();
+                alert("Login Successful!");
+            } else { alert("Invalid OTP."); }
+        }
+
+        function sendSignupOTP() {
+            const name = document.getElementById('signupName').value;
+            const val = document.getElementById('signupInput').value;
+            if(!name || !val) { alert("Please fill all fields."); return; }
+            generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+            pendingUserObj = { name: name, contact: val };
+            document.getElementById('signupOtpHint').textContent = `Demo OTP for ${val}: ${generatedOTP}`;
+            document.getElementById('signupView').classList.add('hidden');
+            document.getElementById('signupOtpView').classList.remove('hidden');
+        }
+
+        function verifySignupOTP() {
+            if(document.getElementById('signupOtpInput').value === generatedOTP) {
+                currentUser = pendingUserObj;
+                updateAuthUI();
+                closeAuthModal();
+                alert("Account created successfully!");
+            } else { alert("Invalid OTP."); }
+        }
+
+        function updateAuthUI() {
+            if(currentUser) {
+                document.getElementById('authSection').innerHTML = `<span class="text-sm font-bold text-blue-700 bg-blue-50 px-3 py-2 rounded-lg"><i class="fa-solid fa-user mr-1"></i> ${currentUser.name}</span>`;
+            }
+        }
+
+        // Profile Logic
+        function openProfileModal() {
+            if(!currentUser) { alert("Please login first."); openAuthModal('login'); return; }
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+
+        function saveProfile() {
+            currentUser.firstName = document.getElementById('profFirstName').value;
+            currentUser.lastName = document.getElementById('profLastName').value;
+            currentUser.name = currentUser.firstName || currentUser.name;
+            updateAuthUI();
+            alert("Profile details saved successfully!");
+            closeModal('profileModal');
+        }
+
+        // Wishlist Logic
+        function toggleWishlist(prodId) {
+            const prod = products.find(p => p.id === prodId);
+            const index = wishlist.findIndex(p => p.id === prodId);
+            if(index > -1) {
+                wishlist.splice(index, 1);
+            } else {
+                wishlist.push(prod);
+            }
+            document.getElementById('wishlistCount').textContent = wishlist.length;
+            displayProducts(currentCategory === 'All' ? products : products.filter(p => p.category === currentCategory));
+        }
+
+        function openWishlistModal() {
+            const list = document.getElementById('wishlistItemsList');
+            list.innerHTML = '';
+            if(wishlist.length === 0) {
+                list.innerHTML = `<p class="text-gray-500 text-center py-6">Your wishlist is empty.</p>`;
+            } else {
+                wishlist.forEach(item => {
+                    list.innerHTML += `<div class="flex items-center justify-between border-b pb-3">
+                        <div class="flex items-center space-x-3">
+                            <img src="${item.image}" class="w-12 h-16 object-cover rounded">
+                            <div>
+                                <h4 class="font-bold text-sm">${item.title}</h4>
+                                <p class="text-xs text-blue-600 font-bold">₹${item.price}</p>
+                            </div>
+                        </div>
+                        <button onclick="addToCart(${item.id}); toggleWishlist(${item.id}); openWishlistModal();" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded font-bold">Move to Cart</button>
+                    </div>`;
+                });
+            }
+            document.getElementById('wishlistModal').classList.remove('hidden');
+        }
+
+        // Cart Logic
+        function addToCart(prodId) {
+            if (!currentUser) {
+                alert("Please login first to add items to cart!");
+                openAuthModal('login');
+                return;
+            }
+            const prod = products.find(p => p.id === prodId);
+            const item = cart.find(i => i.id === prodId);
+            if (item) item.quantity += 1;
+            else cart.push({ ...prod, quantity: 1 });
+            updateCartUI();
+            alert(`${prod.title} added to cart!`);
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.quantity, 0);
+            const list = document.getElementById('cartItemsList');
+            list.innerHTML = '';
+            if (cart.length === 0) {
+                list.innerHTML = `<p class="text-gray-500 text-center py-6">Your cart is empty.</p>`;
+                document.getElementById('cartTotalPrice').textContent = '₹0';
+                document.getElementById('couponDiscountRow').style.display = 'none';
+                appliedCoupon = null;
+                discountAmount = 0;
+                return;
+            }
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                list.innerHTML += `<div class="flex items-center justify-between border-b pb-3">
+                    <div class="flex items-center space-x-3">
+                        <img src="${item.image}" class="w-12 h-16 object-cover rounded">
+                        <div>
+                            <h4 class="font-bold text-sm">${item.title}</h4>
+                            <p class="text-xs text-gray-500">₹${item.price} x ${item.quantity}</p>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700 text-sm"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            });
+
+            if(appliedCoupon) {
+                total = Math.max(0, total - discountAmount);
+            }
+            document.getElementById('cartTotalPrice').textContent = `₹${total}`;
+        }
+
+        function removeFromCart(prodId) {
+            cart = cart.filter(i => i.id !== prodId);
+            updateCartUI();
+        }
+
+        function openCartModal() { document.getElementById('cartModal').classList.remove('hidden'); }
+        function closeCartModal() { document.getElementById('cartModal').classList.add('hidden'); }
+
+        function proceedToCheckout() {
+            if (cart.length === 0) { alert("Cart is empty!"); return; }
+            document.getElementById('checkoutTotal').textContent = document.getElementById('cartTotalPrice').textContent;
+            closeCartModal();
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
+
+        function completeOrder() {
+            const address = document.getElementById('shipAddress').value;
+            if(!address) { alert("Please enter delivery address and pincode!"); return; }
+            
+            const newOrder = {
+                id: 'ORD' + Math.floor(100000 + Math.random() * 900000),
+                items: [...cart],
+                total: document.getElementById('checkoutTotal').textContent,
+                address: address,
+                date: new Date().toLocaleDateString(),
+                status: "Out for Delivery"
+            };
+
+            orders.unshift(newOrder);
+            alert("🎉 Order placed successfully!");
+            cart = [];
+            appliedCoupon = null;
+            discountAmount = 0;
+            updateCartUI();
+            closeCheckoutModal();
+        }
+
+        // Orders & Tracking Modals
+        function openOrdersModal() {
+            if (!currentUser) {
+                alert("Please login first to view orders.");
+                openAuthModal('login');
+                return;
+            }
+            const list = document.getElementById('ordersList');
+            list.innerHTML = '';
+            if (orders.length === 0) {
+                list.innerHTML = `<p class="text-gray-500 text-center py-6">No order history found.</p>`;
+            } else {
+                orders.forEach(o => {
+                    list.innerHTML += `<div class="border rounded-xl p-4 space-y-2 bg-gray-50">
+                        <div class="flex justify-between items-center text-xs font-semibold text-gray-500">
+                            <span>Order ID: ${o.id}</span>
+                            <span>${o.date}</span>
+                        </div>
+                        <p class="text-sm font-bold text-gray-800">Total: ${o.total}</p>
+                        <p class="text-xs text-gray-600 truncate">Deliver to: ${o.address}</p>
+                        <div class="flex gap-2 mt-2">
+                            <button onclick="trackOrder('${o.id}')" class="flex-1 bg-blue-600 text-white text-xs py-2 rounded-lg font-bold hover:bg-blue-700 transition">Track Live Location</button>
+                            <button onclick="cancelOrder('${o.id}')" class="bg-red-50 text-red-600 border border-red-200 text-xs px-3 py-2 rounded-lg font-bold hover:bg-red-100 transition">Cancel</button>
+                        </div>
+                    </div>`;
+                });
+            }
+            document.getElementById('ordersModal').classList.remove('hidden');
+        }
+
+        function closeOrdersModal() { document.getElementById('ordersModal').classList.add('hidden'); }
+
+        function cancelOrder(orderId) {
+            if(confirm("Are you sure you want to cancel this order?")) {
+                orders = orders.filter(o => o.id !== orderId);
+                alert("Order cancelled successfully.");
+                openOrdersModal();
+            }
+        }
+
+        function trackOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if(order) {
+                document.getElementById('trackingOrderId').textContent = `Order ID: ${order.id}`;
+                document.getElementById('trackAddress').textContent = order.address;
+                closeOrdersModal();
+                document.getElementById('trackingModal').classList.remove('hidden');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
